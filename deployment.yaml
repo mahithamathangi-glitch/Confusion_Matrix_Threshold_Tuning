@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: confusion-matrix-threshold-app
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: confusion-matrix-threshold
+
+  template:
+    metadata:
+      labels:
+        app: confusion-matrix-threshold
+
+    spec:
+      containers:
+        - name: confusion-matrix-app
+
+          image: confusion-matrix-threshold:latest
+
+          ports:
+            - containerPort: 8501
+
+          command:
+            - streamlit
+
+          args:
+            - run
+            - app.py
+            - --server.address=0.0.0.0
+            - --server.port=8501
+
+
+---
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: confusion-matrix-threshold-service
+
+spec:
+  selector:
+    app: confusion-matrix-threshold
+
+  ports:
+    - protocol: TCP
+      port: 8501
+      targetPort: 8501
+
+  type: LoadBalancer
